@@ -1,0 +1,121 @@
+Author Name: Sidarth Ayyagari
+RUID: 164007024
+Class: Systems Programming (CS214)
+Asst1: ++Malloc
+
+----------------
+----------------
+    SUMMARY
+----------------
+----------------
+
+The assignment was to create functions mymalloc() and myfree()
+which are supposed to replicate malloc() and free(). Given a 
+static char array of size 4096 acting as a memory block, the
+program is designed to allocate memory of a requested size,
+and free memory which was already allocated.
+
+This library contains two c files: "mymalloc.c", "memgrind.c",
+and a header file:" mymalloc.h". "mymalloc.c" contains the 
+function implementations for mymalloc() and myfree(), as well 
+as defragment(). "memgrind.c" is what is used as a main function
+which calls mymalloc() and free(). It includes 6 different
+workloads which were used to test the robustness of the
+mymalloc implementation. The header file "mymalloc.h" is used
+to define my malloc() and free() as well as the defragment() 
+function It also contains a macro that will replace all calls
+to 'malloc(x)' with calls to 'mymalloc(x)' and free(x) with
+myfree(x). Lastly, it contains the static definition of "myblock"
+which is defined to replicate total memory capacity.The library  
+also contains a make file which compiles everything and 
+gives an executable "memgrind". This library also contains
+a testplan.txt which details the last two workloads provided in
+memgrind.c, and why they were chosen. Finally, the library 
+contains a readme.pdf file which you are currently reading, 
+that details a 
+
+------------------
+------------------
+   File Details  
+------------------
+------------------
+
+----------
+mymalloc.h
+----------
+
+The header file includes th
+
+
+----------
+mymalloc.c
+----------
+
+mymalloc():
+
+
+myfree()
+
+defragment():
+
+
+
+In general terms
+
+----------
+memgrind.c
+----------
+
+------------
+testplan.txt
+------------
+
+
+
+--------
+METADATA
+--------
+
+Preface:
+No actual struct is used in this program to represent the 
+metadata because using an actual struct would take up too
+much memory per allocation. Not very space efficient.
+ 
+Instead this program just puts the essential metadata 
+directly into the array. When a malloc request comes in
+a bl
+
+
+Metadata is allocated per "block"
+of memory. For every time mymalloc() is called, a block is
+created in the memory. A block is structured with 5 bytes
+of metadata
+
+
+On every malloc call and every free call, the contents of the
+array are organized and reorganized 
+The metadata used in this program has three components: 
+	1. in-use
+	2. size
+	3. magic number
+ 
+In-use:
+The in-use flag is of type char, and is set to either 'Y' or 'N'
+It is used to let the function know whether the block of memory
+that is allocated is currently being used, or if it has been free'd
+When the malloc function is called, if the memory is available, this flag
+is set to 'Y' and when a pointer to a block of memory is free'd 
+
+Size:
+
+Magic Number:
+
+
+
+
+
+
+
+
+
+.

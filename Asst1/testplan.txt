@@ -1,0 +1,7 @@
+Author Name: Sidarth Ayyagari
+RUID: 164007024
+Asst 1: ++Malloc
+testplan.txt
+
+
+Workload E: 
