@@ -1,0 +1,231 @@
+NAME: Sidarth Ayyagari
+RUID: 164007024
+CLASS: Systems Programming(CS214)
+
+testcases:
+
+
+----------
+testcase1: regular words separated by spaces
+----------
+
+INPUT: ./pointersorter "thing stuff otherstuff blarp"
+
+OUTPUT:
+thing
+stuff
+otherstuff
+blarp
+
+Comments: This is what I expected the output to be. This is correct.
+
+
+----------
+testcase2: separated by numbers/comma
+----------
+INPUT:./pointersorter "thing1stuff3otherstuff,blarp"
+
+OUTPUT:
+thing
+stuff
+otherstuff
+blarp
+
+Comments: This is what I expected the output to be. This is correct.
+
+----------
+testcase3: starting with numbers/punctuation, ending with numbers/punctuation
+----------
+INPUT: ./pointersorter "123zoo2energetically34march.marmosets01928384567zounds"
+
+OUTPUT:
+zounds
+zoo
+marmosets
+march
+energetically
+
+comments: This output is correct. It is in descending alphabetical order.
+
+----------
+testcase6: same words
+----------
+INPUT: ./pointersorter "bustdown bustdown bustdown0193bustdown,,,,,bustdown"
+
+OUTPUT:
+bustdown
+bustdown
+bustdown
+bustdown
+bustdown
+
+Comments: The output is correct. 
+
+----------
+testcase4: same words different capitalization
+----------
+INPUT: ./pointersorter "aand aAnd Aand AAnd AAND"
+
+OUTPUT:
+AAND
+AAnd
+Aand
+aAnd
+aand
+
+Comments: The output is correct.
+
+
+----------
+testcase5: different words, different caps
+----------
+INPUT: ./pointersorter "baby THUGGER gUNNa offSET quavo TAKEofF GUCCIMANE fuTuRe"
+
+OUTPUT:
+THUGGER
+TAKEofF
+GUCCIMANE
+quavo
+offSET
+gUNNa
+fuTuRe
+baby
+
+Comments: Correct output.
+
+----------
+testcase6: different words, different caps, different punctuations
+----------
+INPUT: ./pointersorter "baby@THUGGER43gUNNa#offSET%quavo\\TAKEofF34GUCCIMANE,,fuTuRe"
+
+OUTPUT:
+THUGGER
+TAKEofF
+GUCCIMANE
+quavo
+offSET
+gUNNa
+fuTuRe
+baby
+
+Comments: The output is correct.
+
+----------
+testcase7: no quotations, different words, different capitalization, different punctuation
+----------
+INPUT: ./pointersorter baby@1==THUGGER43666gUNNa3#offSET%1017quavo\089\TAKEofF,%34GUCCIMANE,,,,fuTuRe
+
+OUTPUT:
+THUGGER
+TAKEofF
+GUCCIMANE
+quavo
+offSET
+gUNNa
+fuTuRe
+baby
+
+Comments: The output is still correct!
+
+----------
+testcase8: tab character injected in middle of input string
+----------
+INPUT: ./pointersorter Systems$'\t'1Programming
+
+OUTPUT:
+Systems
+Programming
+
+
+Comments: Correct.
+
+----------
+testcase9: 
+----------
+INPUT: "Systems\t1Programming"
+
+OUTPUT:
+Systems
+Programming
+t
+
+comments: correct.
+
+----------
+testcase10: quotes in quotes
+----------
+INPUT: ./pointersorter "\"quotes\"in\"quotes\""
+
+OUTPUT:
+quotes
+quotes
+in
+
+comments: correct. This is what I expected.
+
+----------
+testcase11: backslash in middle of argv[1]
+----------
+INPUT: ./pointersorter asf\nerw
+
+OUTPUT:
+asfnerw
+
+Comments: not what I expected. I expected:
+asf
+nerw. 
+
+----------
+testcase12: single word
+----------
+INPUT: ./pointersorter tsunami
+
+OUTPUT:
+tsunami
+
+comments: correct. Previously, I was getting a Segmentation fault, but I realized that I was stepping on a null in the case of only one token. I fixed it and got the output that I expected.
+
+----------
+testcase13:just numbers/symbols
+----------
+INPUT: ./pointersorter 333
+
+OUTPUT:
+
+comments: The output was nothing. Not even a blank line. Good.
+
+
+
+
+----------
+testcase14: too many inputs
+----------
+INPUT: ./pointersorter hey there
+
+OUTPUT:
+Fatal Error: Found 2 arguments, was expecting 1
+Usage: ./pointersorter 'input string'
+
+comments: The output was correct.
+
+
+----------
+testcase15:no input
+----------
+INPUT: ./pointersorter
+
+OUTPUT:
+Fatal Error: Found 0 arguments, was expecting 1
+Usage: ./pointersorter 'input string'
+
+comments: The output was correct.
+
+
+----------
+testcase16: empty input
+----------
+INPUT: ./pointersorter ""
+
+OUTPUT:
+
+comments: The output was nothing. Not even a blank line. Good.
