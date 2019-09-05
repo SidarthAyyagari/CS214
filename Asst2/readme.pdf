@@ -1,0 +1,365 @@
+Athor: SIDARTH AYYAGARI
+RUID: 164007024
+Class: Systems Programming (CS214)
+Asst2: FileCompression
+Partners: n/a (My partner dropped the class and provided no assistance, no code, and no insight for this project.)
+
+
+--------------
+-------------- 
+-------------- 
+   SUMMARY
+--------------
+-------------- 
+--------------
+
+
+The assignment was to create a program that handles a command-line switch that either builds a Huffman Codebook, compresses a file based on
+a given Huffman Codebook, or decompresses a file based on a given Huffman Codebook. The program handles four different flags being passed:
+-b, -c, -d, and -R. Either -b, -c, or -d should be passed which correspond to build, compress, and decompress, respectively. If the -R flag 
+is also passed, the program will do the specific build, compress, or decompress operation recursively on a directory. In this recursive case,
+the program will traverse the specified directory and find all .txt files and perform the specified operation on each file. 
+
+If -R is passed, a directory must be passed. If a file is passed with the recursive flag, a warning message is printed and the operation is 
+continued on the one file.
+
+
+If -b is passed without -R, then the program will read a file, tokenize the file, and keep a count of how many occurrences each token has within
+that file. Then it builds a huffman tree based on the counts of the files. After the huffman tree is built, the tree is traversed in search for
+each token, recursively, and when a token is encountered, the token and bitencoding are written to a file called HuffmanCodebook, which will be
+written in the directory that the executable was ran in. If -b is passed with -R, then the huffman tree will be built based off of an array of
+filenames, which will tokenize each file in the array and build one huffman tree including every token found in any of the files. One
+HuffmanCodebook file will be written in this case. 
+
+Usage:
+
+./fileCompressor -R -b <directory-name>
+./fileCompressor -b <filename.txt>
+
+Output: A file called HuffmanCodebook with each line containing a token and that token's specific bitencoding
+
+
+If -c is passed without -R, then the program will expect a .txt file, which is the file that the program will compress. Also, the program will
+expect a HuffmanCodebook which will be used to compress the file. The program will first read the Huffman Codebook and create a linked list
+which will hold each token and its bitencoding in a node. After the Huffman Codebook is read into the linked list, the .txt file (which we
+want to compress) will be read token by token. For each token encountered, the program will write the associated bitencoding to a new file.
+The output will be a file in the form <filename.txt>.hcz which will be written alongside the original file.
+
+If -c is passed with -R, then the program will find each file within the directory, compress each .txt file, and write a file in the form 
+<filename.txt>.hcz alongside each <filename>.txt file found. 
+
+Usage:
+./fileCompressor -R -c <directory-name> HuffmanCodebook
+./fileCompressor -c <filename>.txt HuffmanCodebook
+
+
+If -d is passed without -R, then the program will expect a .hcz file, which is the file that the program will decompress. Also, the program will
+expect a HuffmanCodebook which will be used to decompress the file. The program will first read the Huffman Codebook and create a huffman tree
+which will hold each token in a tree node. After the Huffman Codebook is read into the tree, the .hcz file (which we want to decompress) will be 
+read bit by bit until a leaf node is reached in the tree. Once a leaf node is reached, the corresponding token will be written to a new file
+The output will be a file in the form <filename>.txt which will be written alongside the original compressed file.
+
+If -d is passed with -R, then the program will find each file within the directory, decompress each .hcz file, and write a file in the form
+<filename>.txt alongside each <filename.txt>.hcz file found.
+
+
+------------------------
+------------------------
+    fileCompressor.h 
+------------------------
+------------------------
+
+This is the header file for the source files fileCompressor.c, build.c, compress.c, and decompress.c
+
+It includes definitions of structs used in each source file, and declarations for each function which will be defined in the corresponding
+source file. It is organized by source file.
+
+
+------------------------
+------------------------
+        makefile
+------------------------
+------------------------
+
+Typing 'make' in the command line will compile all source files and create an executable called 'fileCompressor' which will be used as 
+previously described. 'make clean' removes the exectuable and also removes all .o files which were made as a byproduct of compilation.
+
+
+------------------------
+------------------------
+    fileCompressor.c
+------------------------
+------------------------
+
+--------------
+   STRUCTS
+--------------
+fileNode:
+This structure has two attributes. "fullpath" is a string containing the path to a file. "next" points to the next node in the linked list.
+This structure is used in the recursive case to build a linked list containing the paths of all files that exist in a directory and the 
+directory's subdirectories.
+
+
+-------------
+  FUNCTIONS
+-------------
+main():
+This is the main function which is designed to parse the command line input and verify that proper flags and files are passed 
+in. It will print an error message and return, if the program was ran incorrectly. If it is run correctly, then it will call one of the 
+functions 'build', 'compress' or 'decompress' (with a recursive flag if passed in) to do what was requested. 
+
+is_it_a_directory():
+This function takes in a path and returns an int, which serves the purpose of a boolean. This function is used to make sure that if the -R is
+passed in, that the path passed in is actually a directory.  
+
+listdir():
+This source file also contains a function called 'listdir', which recursively searches a directory for files and creates a linked list where 
+each node contains the fullpath of a file found in the directory. This function takes in a path and uses opendir() and readdir() to get the contents
+of the directory. Each "item" in the directory is checked if the item is a subdirectory, in which case, the function calls itself passing in the 
+path of the subdirectory. If the "item" is not a directory, then we enter the item into the linked list and return. When 'listdir' finishes, a
+linked list is created with each node containing a full path of a file found in the recursive search. 
+
+- fhead is a pointer that points to the head of the linked list of files.
+- fptr is a pointer that we use to traverse the linked list. 
+
+build():
+This function, depending on whether the -R flag was passed, decides whether to build recursively or just
+build using a single file. It makes an array containing all file paths and passes it into hcbBuilder(),
+which will be described in the 'build.c' section of this readme.
+
+compress():
+This function, depending on whether the -R flag was passed, decides whether to compress recursively, or 
+just compress a single file. It loops through the file linked list and calls compressor() on each one. 
+
+decompress():
+This function, depending on whether the -R flag was passed, decides whether to decompress recursively, 
+or just decompress a single file. It loops through the file linked list and calls decompressor() on 
+each one. 
+
+ 
+------------------------
+------------------------
+         build.c
+------------------------
+------------------------
+
+--------------
+   STRUCTS
+--------------
+tokenNode:
+This structure has 4 attributes
+  1. char* name ---------- name of the token
+  2. int count  ---------- number of occurrences of token
+  3. char* bitencoding --- huffman encoding of token based off of path traversed in huffman tree
+  4. tokenNode* next ----- pointer to the next node in the linked list
+
+treenode:
+This structure has 4 attributes:
+  1. char* name ---------- name of the token
+  2. int count ----------- number of occurrences
+  3. treenode* right ----- right child
+  4. treenode* left  ----- left child
+
+
+These data structures are used to capture all tokens in a linked list, and then build a tree given 
+the list of tokens. The linked list is created, filled, then sorted, and this sorted list is used 
+to build the binary tree, which will be used to generate huffman encoding for each token. Then the
+huffman encoding is written to a file along with the token that corresponds to it.
+
+
+-------------
+  FUNCTIONS
+-------------
+fileTokenizer:
+This function takes in a file, and reads the file token by token. Tokens are split by delimiters. Delimiters
+in the context of this assignment are white-space characters and control characters. <ctype.h> has functions
+which allow the program to tokenize the file this way. Delimiters are also considered tokens. Each token is 
+inserted into the token linked list. 
+
+//MERGESORT: sorts token list by count in descending order
+
+
+sortedMerge():
+Sorted Merge takes in two node pointers, each referring to the head of a sublist. Before anything, 
+a tnode_t* result is intialized to null. If either a or b are null, then the other is returned. If both 
+are not null, then the counts of each node are compared. If a->count is less than or equal to b->count, then
+sortedMerge is called on a->next and b. If not, then sortedMerge is called on a, and b->next. either way the
+return value of the recursive call is saved in result.
+
+fbsplit():
+This function is passed in a node_t* and two node_t**. The first is the starting point of the linked list, 
+and the next two are just pointers which will be reassigned to other pointers at the end of the function. 
+Two node_t* are declared (fast and slow). They are called fast and slow, because in the while loop, fast is 
+incremented twice, so long as it doesn't step on a null, and slow is incremented only once. By the end of 
+the loop, slow will be at the halfway point of the list and fast will be null. The reassignments of 
+pointers at the end make sure that the list is split in half.
+
+mergesort():
+This function should be passed in a node_t**. In the main function, MergeSort() is called once and passed 
+in &head. head is of type node_t*, so &head will be of type node_t**. First, we check if the linked list 
+is of size 0 or 1, because then no operation needs to be done, so we just return. (Since this function is 
+recursive, it will reach this point inevitably once it gets to the bottom recursion level.) Then it splits 
+the list in half using fbsplit() and recursively calls itselg on the two sublists. Lastly, it sets the head 
+equal to the output of SortedMerge().
+
+
+//HUFFMAN TREE CONSTRUCTION
+
+newNode():
+- creates new treenode, 
+- allocate memory for it
+- sets name to the token name passed in(this represents the actual token obtained from file)
+- sets count to int passed in. (this represents the number of occurrences of the token)
+
+createMinHeap():
+- creates a new minheap
+- allocates memory
+- sets size to 0
+- sets capacity equal to the integer passed in
+- allocates memory for treenode array
+
+swapmhnode():
+- swaps pointers pointing to two tree node pointers
+
+heapify():
+-recursive helper function to build a minheap 
+
+issizeone():
+- just checks if the size of a minheap is 1
+
+extractmin():
+- pulls out the first item in the minheap and decrements the size of the minheap
+
+isLeaf():
+- this function checks if 
+
+buildHuffmanTree():i
+- builds minheap given an array of tokens and another array of occurence counts. Then it 
+  converts minheap to a huffman tree
+
+writeCodes():
+- recursively touches all leaf nodes in binary tree, and writes the corresponding bitencoding and token to a file.
+
+deallocate():
+- free's memory allocated by huffman tree, treenode by treenode
+
+HuffmanCodes():
+- this function calls buildHuffmanTree() and writeCodes(), which creates the actual tree needed to generate
+the huffman codes we want to write, and then the codes are written to a file by writeCodes().
+
+is_it_txt_file():
+- This function checks if a file is a text file or not. (I saw one of the ta's say on piazza that
+the only files that should be used to build the codebook are .txt files)
+
+hcbBuilder():
+This is the function that is directly called by the main in fileCompressor.c. This function calls
+the other functions in this file to build a Huffman Codebook. It takes an array of filenames, and 
+the length of the array, and builds a huffman codebook. First it loops through the files in the 
+the array and tokenizes each file. After each file is tokenized, there is an unsorted list of tokens
+which is then sorted by mergesort. Then the file ./HuffmanCodebook is opened, and the function
+HuffmanCodes() is called which builds the Huffman tree and writes each token to the new file.
+
+------------------------
+------------------------
+       compress.c
+------------------------
+------------------------
+
+-----------
+  STRUCTS
+-----------
+llNode:
+- an llNode has 3 attributes
+  1. char* token ----------- this refers to the actual word that occurs in the document that we want to compress
+  2. char* bitencoding ----- this refers to the bitencoding of the token
+  3. llNode* next ---------- this points to the next llNode in the linked list
+
+The data structure we use to hold the information gathered from the HuffmanCodebook file is a linked list.
+Since each node has the bitencoding and token in it, all the program does is read the to-be-compressed
+file token by token, and write the corresponding bitencoding to a file.
+
+-------------
+  FUNCTIONS
+-------------
+lineParser():
+This function takes in a line from the huffman codebook and inserts it into the Huffman tree. It breaks
+up the line of the codebook into two pieces: asci token and bitencoding. It puts both into a llnode and
+inserts the llnode into a linked list containing all tokens. 
+
+parseHuffCodebook(): 
+This function builds a huffman tree give the codebook that was passed in. It breaks the huffman codebook up
+line by line and passes in each line to lineParser(). 
+
+compressor():
+This function is directly called by the main in fileCompressor.c. Every other function in this source
+file is a helper function of this function. This function takes in two char* 's. One is the file path
+and the other is the path for the Huffman Codebook. First, the function checks if the arguments passed 
+were actually valid. If they are determined to be valid, then parseHuffmanCodebook() is called. This 
+builds a linkedlist where each node contains a token, and its bitencoding. After the linkedlist is built,
+The to-be-compressed file is opened and the program begins to read it. The program reads this file token
+by token, and as each token found, the file writes the corresponding bitencoding to a new file. Lastly, 
+the linked list is free()'d.
+
+------------------------
+------------------------
+      decompress.c
+------------------------
+------------------------
+
+
+-----------
+  STRUCTS
+-----------
+
+huffNode:
+- a huffNode has 4 attributes
+  1. char* token ----------- this refers to the actual word that occurs in the document that we want to compress
+  2. char* bitencoding ----- this refers to the bitencoding of the token
+  3. huffNode *left -------- this points to the left child of the huffNode
+  4. huffNode *right ------- this points to the right child of the huffNode
+
+The data structure used to hold the information given by the Huffman Codebook is a binary tree. We read the
+Huffman Codebook in a similar way as in compress, however, when we split each line into bitencoding and asci token
+we use the bitencoding to traverse our binary tree and insert the huffNode in the proper position. 
+
+-------------
+  FUNCTIONS
+-------------
+
+
+insertHuffNode():
+Loops through the bitencoding and traverses the binary tree based off of it. If the bit is 0, then we move to the left
+child. If the bit is 1, then we move right. The program loops through the whole bitencoding and ends up in the position
+where the node is to be inserted. The node is inserted, and the function returns. 
+
+lineBreaker():
+This function is very similar to lineParser() in compress.c. It splits a line into it's bitencoding and asci token.
+Both are passed into insertHuffNode. 
+
+bookToTree():
+This function takes in a path to a Huffman Codebook and reads the codebook line by line and calls lineBreaker()
+for each line.
+
+decompressor():
+This function is directly called by the main function in fileCompressor.c. The other three functions in this 
+source file are helper functions to this function. First this function checks the validity of the huffman codebook
+and the file that we want to decompress. If both are valid, bookToTree() is called. Then the compressed file is 
+read bit by bit and the tree is traversed until a leaf node is reached. When a leaf is reached in the tree, the token
+of that leaf node is written to a new file. Then the ptr is set back to the head, and the function continues to read
+the file bit by bit.
+
+
+------------------------
+SPACE AND TIME ANALYSIS
+------------------------
+
+The design of this program is not the most efficient in terms of time or space. In terms of space, I malloc 
+quite a bit and I tried free()'ing memory where I felt it was appropriate, but it affected the output. Also,
+timewise, it is not the most efficient because it loops through the file once, but for compress and decompress,
+a complete traversal of the data structure is required to find the apporpriate bitencoding or token to write
+to the new file. For compress, ptr might visit every node in the linked list to find the matching token. For 
+decompress, I think that using a tree structure was more efficient. But build and compress both definitely could
+have been implemented with more importance given to space and time eficiency.
+
+
+
